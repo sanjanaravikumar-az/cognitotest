@@ -1,0 +1,284 @@
+.app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+  color: #1a202c;
+}
+
+.subtitle {
+  color: #718096;
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+.subtitle code {
+  background: #edf2f7;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #2d3748;
+}
+
+.sign-out-btn {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.15s;
+}
+
+.sign-out-btn:hover {
+  background: #c53030;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  color: #2d3748;
+}
+
+/* Auth Info */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a0aec0;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 0.9rem;
+  color: #2d3748;
+  word-break: break-all;
+}
+
+.highlight {
+  color: #2b6cb0;
+  font-weight: 600;
+}
+
+.highlight-warn {
+  color: #c05621;
+  font-weight: 600;
+}
+
+/* Token Display */
+.token-note {
+  font-size: 0.85rem;
+  color: #718096;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.token-note code {
+  background: #edf2f7;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #718096;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  color: #2d3748;
+}
+
+.tab.active {
+  color: #2b6cb0;
+  border-bottom-color: #2b6cb0;
+  font-weight: 600;
+}
+
+.tab-content {
+  min-height: 200px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.toggle-btn {
+  background: #edf2f7;
+  border: 1px solid #e2e8f0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #4a5568;
+  transition: all 0.15s;
+}
+
+.toggle-btn:hover {
+  background: #e2e8f0;
+}
+
+pre {
+  background: #1a202c;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.token-decoded h3 {
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin: 1rem 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.token-decoded h3:first-child {
+  margin-top: 0;
+}
+
+.token-raw {
+  font-size: 0.75rem;
+}
+
+/* Session Panel */
+.session-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.session-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.session-note {
+  background: #fffff0;
+  border: 1px solid #fefcbf;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.session-note p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #744210;
+  line-height: 1.5;
+}
+
+.session-note code {
+  background: #fefcbf;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.loading {
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.error-card {
+  border-color: #fed7d7;
+  background: #fff5f5;
+}
+
+.error-card h2 {
+  color: #c53030;
+}
+
+.error-card p {
+  color: #9b2c2c;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.app-footer p {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  line-height: 1.6;
+}
+
+.app-footer code {
+  background: #edf2f7;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: #718096;
+}
+
+@media (max-width: 600px) {
+  .info-grid,
+  .session-grid {
+    grid-template-columns: 1fr;
+  }
+}

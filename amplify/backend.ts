@@ -1,7 +1,8 @@
 import { auth } from './auth/resource';
 import { storage } from './storage/resource';
 import { defineBackend } from '@aws-amplify/backend';
-import { Duration } from 'aws-cdk-lib';
+import { Aspects, CfnOutput, Duration, IAspect } from 'aws-cdk-lib';
+import { IConstruct } from 'constructs';
 // import { Tags } from 'aws-cdk-lib';
 
 const backend = defineBackend({
@@ -43,16 +44,27 @@ s3Bucket.bucketEncryption = {
   ],
 };
 
-const authConstruct = backend.auth.stack.node.findAll();
-// for (const node of authConstruct) {
-//   console.log(node.node.id);
-// }
-
 const amplifyAuth = backend.auth.stack.node.findChild('amplifyAuth');
 amplifyAuth.node.tryRemoveChild('IdentityPool');
 amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
 amplifyAuth.node.tryRemoveChild('authenticatedUserRole');
 amplifyAuth.node.tryRemoveChild('unauthenticatedUserRole');
+
+// Also remove the CloudFormation Output that references the Identity Pool.
+// The auth construct's storeOutput writes an Output with the Identity Pool ID,
+// and CloudFormation fails if the referenced resource doesn't exist.
+class RemoveIdentityPoolOutputs implements IAspect {
+  visit(node: IConstruct): void {
+    if (
+      node instanceof CfnOutput &&
+      node.node.id.toLowerCase().includes('identitypool')
+    ) {
+      node.node.scope?.node.tryRemoveChild(node.node.id);
+    }
+  }
+}
+
+Aspects.of(backend.auth.stack).add(new RemoveIdentityPoolOutputs());
 
 // Uncomment post refactor to force a redeployment
 // Tags.of(backend.stack).add('gen2-migration/post-refactor', 'true');

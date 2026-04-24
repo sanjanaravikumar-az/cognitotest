@@ -1,8 +1,7 @@
 import { auth } from './auth/resource';
 import { storage } from './storage/resource';
 import { defineBackend } from '@aws-amplify/backend';
-import { CfnOutput, Duration } from 'aws-cdk-lib';
-import { IConstruct } from 'constructs';
+import { Duration } from 'aws-cdk-lib';
 // import { Tags } from 'aws-cdk-lib';
 
 const backend = defineBackend({
@@ -51,35 +50,14 @@ amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
 amplifyAuth.node.tryRemoveChild('authenticatedUserRole');
 amplifyAuth.node.tryRemoveChild('unauthenticatedUserRole');
 
-// Remove ALL CfnOutput nodes that reference the Identity Pool.
-// The auth construct's storeOutput creates CfnOutput nodes that
-// Ref the Identity Pool resource, causing CloudFormation to fail
-// with "Unresolved resource dependencies" when the resource is removed.
-// We walk the entire auth stack construct tree to find and remove them.
-function removeIdentityPoolOutputs(construct: IConstruct) {
-  for (const child of construct.node.children) {
-    if (child instanceof CfnOutput) {
-      // Check if this output's value references the identity pool
-      try {
-        const outputValue = JSON.stringify(
-          backend.auth.stack.resolve((child as CfnOutput).value)
-        );
-        if (outputValue.includes('IdentityPool')) {
-          child.node.scope?.node.tryRemoveChild(child.node.id);
-          continue;
-        }
-      } catch {
-        // If resolve fails, check by node ID
-      }
-      if (child.node.id.toLowerCase().includes('identitypool')) {
-        child.node.scope?.node.tryRemoveChild(child.node.id);
-        continue;
-      }
-    }
-    removeIdentityPoolOutputs(child);
-  }
-}
-removeIdentityPoolOutputs(backend.auth.stack);
+// The auth construct's storeOutput creates CfnOutput entries on the
+// auth STACK (not the amplifyAuth construct) via StackMetadataBackendOutputStorageStrategy.
+// The output key for the identity pool is "identityPoolId".
+// We must remove it from the stack to avoid "Unresolved resource dependencies".
+backend.auth.stack.node.tryRemoveChild('identityPoolId');
+
+// Also remove the allowUnauthenticatedIdentities output
+backend.auth.stack.node.tryRemoveChild('allowUnauthenticatedIdentities');
 
 // Uncomment post refactor to force a redeployment
 // Tags.of(backend.stack).add('gen2-migration/post-refactor', 'true');

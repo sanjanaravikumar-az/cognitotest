@@ -1,7 +1,7 @@
 import { auth } from './auth/resource';
 import { storage } from './storage/resource';
 import { defineBackend } from '@aws-amplify/backend';
-import { Aspects, CfnOutput, Duration, IAspect } from 'aws-cdk-lib';
+import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { IConstruct } from 'constructs';
 // import { Tags } from 'aws-cdk-lib';
 
@@ -44,27 +44,42 @@ s3Bucket.bucketEncryption = {
   ],
 };
 
+// Remove Identity Pool and related resources from the auth construct
 const amplifyAuth = backend.auth.stack.node.findChild('amplifyAuth');
 amplifyAuth.node.tryRemoveChild('IdentityPool');
 amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
 amplifyAuth.node.tryRemoveChild('authenticatedUserRole');
 amplifyAuth.node.tryRemoveChild('unauthenticatedUserRole');
 
-// Also remove the CloudFormation Output that references the Identity Pool.
-// The auth construct's storeOutput writes an Output with the Identity Pool ID,
-// and CloudFormation fails if the referenced resource doesn't exist.
-class RemoveIdentityPoolOutputs implements IAspect {
-  visit(node: IConstruct): void {
-    if (
-      node instanceof CfnOutput &&
-      node.node.id.toLowerCase().includes('identitypool')
-    ) {
-      node.node.scope?.node.tryRemoveChild(node.node.id);
+// Remove ALL CfnOutput nodes that reference the Identity Pool.
+// The auth construct's storeOutput creates CfnOutput nodes that
+// Ref the Identity Pool resource, causing CloudFormation to fail
+// with "Unresolved resource dependencies" when the resource is removed.
+// We walk the entire auth stack construct tree to find and remove them.
+function removeIdentityPoolOutputs(construct: IConstruct) {
+  for (const child of construct.node.children) {
+    if (child instanceof CfnOutput) {
+      // Check if this output's value references the identity pool
+      try {
+        const outputValue = JSON.stringify(
+          backend.auth.stack.resolve((child as CfnOutput).value)
+        );
+        if (outputValue.includes('IdentityPool')) {
+          child.node.scope?.node.tryRemoveChild(child.node.id);
+          continue;
+        }
+      } catch {
+        // If resolve fails, check by node ID
+      }
+      if (child.node.id.toLowerCase().includes('identitypool')) {
+        child.node.scope?.node.tryRemoveChild(child.node.id);
+        continue;
+      }
     }
+    removeIdentityPoolOutputs(child);
   }
 }
-
-Aspects.of(backend.auth.stack).add(new RemoveIdentityPoolOutputs());
+removeIdentityPoolOutputs(backend.auth.stack);
 
 // Uncomment post refactor to force a redeployment
 // Tags.of(backend.stack).add('gen2-migration/post-refactor', 'true');

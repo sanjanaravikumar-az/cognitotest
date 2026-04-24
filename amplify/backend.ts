@@ -43,5 +43,16 @@ s3Bucket.bucketEncryption = {
   ],
 };
 
+const authConstruct = backend.auth.stack.node.findAll();
+// for (const node of authConstruct) {
+//   console.log(node.node.id);
+// }
+
+const amplifyAuth = backend.auth.stack.node.findChild('amplifyAuth');
+amplifyAuth.node.tryRemoveChild('IdentityPool');
+amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
+amplifyAuth.node.tryRemoveChild('authenticatedUserRole');
+amplifyAuth.node.tryRemoveChild('unauthenticatedUserRole');
+
 // Uncomment post refactor to force a redeployment
 // Tags.of(backend.stack).add('gen2-migration/post-refactor', 'true');

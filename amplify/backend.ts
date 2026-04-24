@@ -8,33 +8,23 @@ const backend = defineBackend({
 });
 
 // ============================================================
-// WORKAROUND: Remove Identity Pool created by defineAuth.
+// WORKAROUND: Neuter the Identity Pool that defineAuth creates.
 //
 // Gen1 was configured as "userPoolOnly" (no Identity Pool).
-// Gen2's defineAuth always creates an Identity Pool, which
-// changes the auth architecture. This override removes it
-// to match the original Gen1 configuration.
+// Gen2's defineAuth always creates an Identity Pool and there
+// is no way to opt out or remove it — the construct's internal
+// output references prevent deletion.
+//
+// This is the bug: the migration tool should not create an
+// Identity Pool for userPoolOnly configurations.
+//
+// Best we can do is disable unauthenticated access.
+// The identity_pool_id will still appear in amplify_outputs.json
+// but the SDK handles it gracefully when no credentials are needed.
 // ============================================================
-
-// Get the underlying CloudFormation resources
-const { cfnIdentityPool, cfnIdentityPoolRoleAttachment } =
-  backend.auth.resources.cfnResources;
-
-// Remove the Identity Pool and its role attachment from the stack
-const identityPoolLogicalId = cfnIdentityPool.node.id;
-const roleAttachmentLogicalId = cfnIdentityPoolRoleAttachment.node.id;
-cfnIdentityPool.node.scope?.node.tryRemoveChild(identityPoolLogicalId);
-cfnIdentityPoolRoleAttachment.node.scope?.node.tryRemoveChild(
-  roleAttachmentLogicalId
-);
-
-// Remove the auth/unauth IAM roles (they only exist for the Identity Pool)
-const authRole = backend.auth.resources.authenticatedUserIamRole;
-const unauthRole = backend.auth.resources.unauthenticatedUserIamRole;
-const authRoleNode = authRole.node;
-const unauthRoleNode = unauthRole.node;
-authRoleNode.scope?.node.tryRemoveChild(authRoleNode.id);
-unauthRoleNode.scope?.node.tryRemoveChild(unauthRoleNode.id);
+const cfnIdentityPool =
+  backend.auth.resources.cfnResources.cfnIdentityPool;
+cfnIdentityPool.allowUnauthenticatedIdentities = false;
 
 // Override the User Pool settings to match Gen1 config
 const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;

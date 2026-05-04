@@ -45,29 +45,29 @@ s3Bucket.bucketEncryption = {
   ],
 };
 
-// --- Remove Identity Pool ---
+// // --- Remove Identity Pool ---
 
-const amplifyAuth = backend.auth.stack.node.findChild('amplifyAuth');
-const cfnIdentityPool = backend.auth.resources.cfnResources.cfnIdentityPool;
+// const amplifyAuth = backend.auth.stack.node.findChild('amplifyAuth');
+// const cfnIdentityPool = backend.auth.resources.cfnResources.cfnIdentityPool;
 
-const logicalId = backend.auth.stack.resolve((cfnIdentityPool as any).logicalId) as string;
+// const logicalId = backend.auth.stack.resolve((cfnIdentityPool as any).logicalId) as string;
 
-new CfnParameter(backend.auth.stack, 'IdentityPoolIdParam', {
-  type: 'String',
-  default: 'NONE',
-});
-const param = backend.auth.stack.node.findChild('IdentityPoolIdParam') as CfnParameter;
-param.overrideLogicalId(logicalId);
+// new CfnParameter(backend.auth.stack, 'IdentityPoolIdParam', {
+//   type: 'String',
+//   default: 'NONE',
+// });
+// const param = backend.auth.stack.node.findChild('IdentityPoolIdParam') as CfnParameter;
+// param.overrideLogicalId(logicalId);
 
-amplifyAuth.node.tryRemoveChild('IdentityPool');
-//remove roles
-amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
+// amplifyAuth.node.tryRemoveChild('IdentityPool');
+// //remove roles
+// amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
 
-// Override the CfnOutput values instead of removing them
-const idPoolOutput = backend.stack.node.findChild('identityPoolId') as CfnOutput;
-(idPoolOutput as any).value = 'NONE';
-const allowUnauthOutput = backend.stack.node.findChild('allowUnauthenticatedIdentities') as CfnOutput;
-(allowUnauthOutput as any).value = 'false';
+// // Override the CfnOutput values instead of removing them
+// const idPoolOutput = backend.stack.node.findChild('identityPoolId') as CfnOutput;
+// (idPoolOutput as any).value = 'NONE';
+// const allowUnauthOutput = backend.stack.node.findChild('allowUnauthenticatedIdentities') as CfnOutput;
+// (allowUnauthOutput as any).value = 'false';
 
 
 

@@ -60,8 +60,8 @@ const param = backend.auth.stack.node.findChild('IdentityPoolIdParam') as CfnPar
 param.overrideLogicalId(logicalId);
 
 amplifyAuth.node.tryRemoveChild('IdentityPool');
-// //remove roles
-// amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
+//remove roles
+amplifyAuth.node.tryRemoveChild('IdentityPoolRoleAttachment');
 
 // Override the CfnOutput values instead of removing them
 const idPoolOutput = backend.stack.node.findChild('identityPoolId') as CfnOutput;
